@@ -1,0 +1,40 @@
+% Author: Herbert Kruitbosch , Copyright: be nice.
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{elasticrow}[2015/02/13 Friday 13th code.]
+
+\RequirePackage{graphicx}
+\RequirePackage{subfigure}
+
+\newcommand{\elasticfigure}[2][\empty]{%
+  \argumenttoks=\expandafter{\the\argumenttoks \elasticfun[#1]{#2}}%
+}
+
+\newlength{\elasticheight}
+\newlength{\elasticwidth}
+\newsavebox{\elasticbox}
+\newtoks{\argumenttoks}
+
+\newenvironment{elasticrow}[1][0.01em]{
+   \def\elasticwhitespace{#1}
+   \argumenttoks={}
+}{
+  \setlength{\elasticwidth}{\textwidth}
+  \addtolength{\elasticwidth}{\elasticwhitespace}
+  \let\elasticfun=\elasticcalculatewidth
+  \the\argumenttoks
+  \let\elasticfun=\elasticpreprocess
+  \let\elasticsep=\empty 
+  \sbox\elasticbox{
+    \resizebox{\elasticwidth}{!}{\the\argumenttoks}
+  }
+  \setlength{\elasticheight}{\ht\elasticbox}
+  \let\elasticfun=\elasticprocess
+  \let\elasticsep=\empty 
+  \the\argumenttoks
+}
+\newcommand{\elasticcalculatewidth}[2][\empty]{\addtolength{\elasticwidth}{-\elasticwhitespace}}
+\newcommand{\elasticpreprocess}[2][\empty]{\includegraphics[height=1cm]{#2}}
+
+\newcommand{\elasticprocess}[2][\empty]{\elasticsep\subfigure[#1]{\includegraphics[height=\elasticheight]{#2}}\let\elasticsep=\hfill}
+
+\endinput
