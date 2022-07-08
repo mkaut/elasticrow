@@ -3,7 +3,7 @@
 \ProvidesPackage{elasticrow}[2015/02/13 Friday 13th code.]
 
 \RequirePackage{graphicx}
-\RequirePackage{subfigure}
+\RequirePackage{subcaption}
 
 \newcommand{\elasticfigure}[2][\empty]{%
   \argumenttoks=\expandafter{\the\argumenttoks \elasticfun[#1]{#2}}%
@@ -35,6 +35,6 @@
 \newcommand{\elasticcalculatewidth}[2][\empty]{\addtolength{\elasticwidth}{-\elasticwhitespace}}
 \newcommand{\elasticpreprocess}[2][\empty]{\includegraphics[height=1cm]{#2}}
 
-\newcommand{\elasticprocess}[2][\empty]{\elasticsep\subfigure[#1]{\includegraphics[height=\elasticheight]{#2}}\let\elasticsep=\hfill}
+\newcommand{\elasticprocess}[2][\empty]{\elasticsep\subcaptionbox{#1}{\includegraphics[height=\elasticheight]{#2}}\let\elasticsep=\hfill}
 
 \endinput
