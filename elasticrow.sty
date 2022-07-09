@@ -1,40 +1,61 @@
-% Author: Herbert Kruitbosch , Copyright: be nice.
-\NeedsTeXFormat{LaTeX2e}[1994/06/01]
-\ProvidesPackage{elasticrow}[2015/02/13 Friday 13th code.]
+% Author: Herbert Kruitbosch, Michal Kaut; Copyright: be nice.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{elasticrow}[2022/02/13 Fit figures of different height to a row]
 
 \RequirePackage{graphicx}
 \RequirePackage{subcaption}
+\RequirePackage{keyval}
+\RequirePackage{etoolbox}
 
-\newcommand{\elasticfigure}[2][\empty]{%
-  \argumenttoks=\expandafter{\the\argumenttoks \elasticfun[#1]{#2}}%
-}
+%% main control parameters, can be changed by user
+% TODO: add package options
+% width of the row
+\newlength{\elasticrowwidth}\setlength{\elasticrowwidth}{\textwidth}
+% separation between figures
+\newlength{\elasticrowsep}\setlength{\elasticrowsep}{0pt}
 
+%% internal definitions
 \newlength{\elasticheight}
 \newlength{\elasticwidth}
+\newlength{\elasticsep}
 \newsavebox{\elasticbox}
 \newtoks{\argumenttoks}
+\newif\ifelasticrowfullwidth
 
-\newenvironment{elasticrow}[1][0.01em]{
-   \def\elasticwhitespace{#1}
-   \argumenttoks={}
-}{
-  \setlength{\elasticwidth}{\textwidth}
-  \addtolength{\elasticwidth}{\elasticwhitespace}
-  \let\elasticfun=\elasticcalculatewidth
-  \the\argumenttoks
-  \let\elasticfun=\elasticpreprocess
-  \let\elasticsep=\empty 
-  \sbox\elasticbox{
-    \resizebox{\elasticwidth}{!}{\the\argumenttoks}
-  }
-  \setlength{\elasticheight}{\ht\elasticbox}
-  \let\elasticfun=\elasticprocess
-  \let\elasticsep=\empty 
-  \the\argumenttoks
+\newcommand{\elasticfigure}[2][\empty]{%
+	\argumenttoks=\expandafter{\the\argumenttoks\elasticfun[#1]{#2}}%
+}
+
+\define@key{elasticrowkey}{width}{\setlength{\elasticwidth}{#1}}
+\define@key{elasticrowkey}{sep}{\def\elasticwhitespace{#1}}
+
+\newenvironment{elasticrow}[1][]{%
+	\setlength{\elasticwidth}{\elasticrowwidth}%
+	\def\elasticwhitespace{\elasticrowsep}%
+	\setkeys{elasticrowkey}{#1}%
+	\ifdimequal{\elasticwidth}{\textwidth}{\elasticrowfullwidthtrue}{\elasticrowfullwidthfalse}%
+	\argumenttoks={}%
+}{%
+	\addtolength{\elasticwidth}{\elasticwhitespace}%
+	\let\elasticfun=\elasticcalculatewidth%
+	\the\argumenttoks%
+	\let\elasticfun=\elasticpreprocess%
+	\sbox\elasticbox{\resizebox{\elasticwidth}{!}{\the\argumenttoks}}%
+	\setlength{\elasticheight}{\ht\elasticbox}%
+	\let\elasticfun=\elasticprocess%
+	\def\elasticsep{0pt}%
+	\the\argumenttoks%
 }
 \newcommand{\elasticcalculatewidth}[2][\empty]{\addtolength{\elasticwidth}{-\elasticwhitespace}}
 \newcommand{\elasticpreprocess}[2][\empty]{\includegraphics[height=1cm]{#2}}
-
-\newcommand{\elasticprocess}[2][\empty]{\elasticsep\subcaptionbox{#1}{\includegraphics[height=\elasticheight]{#2}}\let\elasticsep=\hfill}
+\newcommand{\elasticprocess}[2][\empty]{%
+	\hspace{\elasticsep}%
+	\ifx#1\empty%
+		\includegraphics[height=\elasticheight]{#2}%
+	\else%
+		\subcaptionbox{#1}{\includegraphics[height=\elasticheight]{#2}}%
+	\fi%
+	\ifelasticrowfullwidth\let\elasticsep=\fill\else\let\elasticsep=\elasticwhitespace\fi%
+}
 
 \endinput
