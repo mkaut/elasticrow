@@ -15,47 +15,57 @@
 \newlength{\elasticrowsep}\setlength{\elasticrowsep}{0pt}
 
 %% internal definitions
-\newlength{\elasticheight}
-\newlength{\elasticwidth}
-\newlength{\elasticsep}
-\newsavebox{\elasticbox}
-\newtoks{\argumenttoks}
-\newif\ifelasticrowfullwidth
+\newlength{\elasticrow@height}
+\newlength{\elasticrow@width}
+\newlength{\elasticrow@sep}
+\newsavebox{\elasticrow@box}
+\newtoks{\elasticbox@argtoks}
+\newif\ifelasticrow@fullwidth
 
+%% command for adding figures to the row
+% syntax: \elasticfigure[<caption>]{<figure_file>}
 \newcommand{\elasticfigure}[2][\empty]{%
-	\argumenttoks=\expandafter{\the\argumenttoks\elasticfun[#1]{#2}}%
+	\elasticbox@argtoks=\expandafter{\the\elasticbox@argtoks\elasticfun[#1]{#2}}%
 }
 
-\define@key{elasticrowkey}{width}{\setlength{\elasticwidth}{#1}}
-\define@key{elasticrowkey}{sep}{\def\elasticwhitespace{#1}}
+%% keys for the elasticrow environment
+\define@key{elasticrow@key}{width}{\setlength{\elasticrow@width}{#1}}
+\define@key{elasticrow@key}{sep}{\def\elasticrow@whitespace{#1}}
 
+%% environment for the elastic row
+% syntax: \begin{elasticrow}[<options>],
+% where <options> use a key-value syntax with keys 'width' and 'sep'
 \newenvironment{elasticrow}[1][]{%
-	\setlength{\elasticwidth}{\elasticrowwidth}%
-	\def\elasticwhitespace{\elasticrowsep}%
-	\setkeys{elasticrowkey}{#1}%
-	\ifdimequal{\elasticwidth}{\textwidth}{\elasticrowfullwidthtrue}{\elasticrowfullwidthfalse}%
-	\argumenttoks={}%
+	\setlength{\elasticrow@width}{\elasticrowwidth}%
+	\def\elasticrow@whitespace{\elasticrowsep}%
+	\setkeys{elasticrow@key}{#1}%
+	\ifdimequal{\elasticrow@width}{\textwidth}{\elasticrow@fullwidthtrue}{\elasticrow@fullwidthfalse}%
+	\elasticbox@argtoks={}%
 }{%
-	\addtolength{\elasticwidth}{\elasticwhitespace}%
+	\addtolength{\elasticrow@width}{\elasticrow@whitespace}%
 	\let\elasticfun=\elasticcalculatewidth%
-	\the\argumenttoks%
+	\the\elasticbox@argtoks%
 	\let\elasticfun=\elasticpreprocess%
-	\sbox\elasticbox{\resizebox{\elasticwidth}{!}{\the\argumenttoks}}%
-	\setlength{\elasticheight}{\ht\elasticbox}%
+	\sbox\elasticrow@box{\resizebox{\elasticrow@width}{!}{\the\elasticbox@argtoks}}%
+	% using 99.9% of the width, to prevent line break with width=\textwidth and sep=0pt
+	% TODO: why is it needed?
+	\setlength{\elasticrow@height}{0.999\ht\elasticrow@box}%
 	\let\elasticfun=\elasticprocess%
-	\def\elasticsep{0pt}%
-	\the\argumenttoks%
+	\def\elasticrow@sep{0pt}%
+	\the\elasticbox@argtoks%
 }
-\newcommand{\elasticcalculatewidth}[2][\empty]{\addtolength{\elasticwidth}{-\elasticwhitespace}}
+\newcommand{\elasticcalculatewidth}[2][\empty]{\addtolength{\elasticrow@width}{-\elasticrow@whitespace}}
 \newcommand{\elasticpreprocess}[2][\empty]{\includegraphics[height=1cm]{#2}}
 \newcommand{\elasticprocess}[2][\empty]{%
-	\hspace{\elasticsep}%
+	\hspace{\elasticrow@sep}%
 	\ifx#1\empty%
-		\includegraphics[height=\elasticheight]{#2}%
+		\includegraphics[height=\elasticrow@height]{#2}%
 	\else%
-		\subcaptionbox{#1}{\includegraphics[height=\elasticheight]{#2}}%
+		\subcaptionbox{#1}{\includegraphics[height=\elasticrow@height]{#2}}%
 	\fi%
-	\ifelasticrowfullwidth\let\elasticsep=\fill\else\let\elasticsep=\elasticwhitespace\fi%
+	% set \elasticrow@sep for the next figures
+	% - uses \fill for full-width rows, to prevent line break due to minor width overflow
+	\ifelasticrow@fullwidth\let\elasticrow@sep=\fill\else\let\elasticrow@sep=\elasticrow@whitespace\fi%
 }
 
 \endinput

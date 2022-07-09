@@ -1,0 +1,90 @@
+\documentclass[a4paper]{scrartcl}
+
+\usepackage{elasticrow}
+\usepackage{caption}
+\usepackage{hyperref}
+\hypersetup{colorlinks,allcolors=blue}
+%\captionsetup[subfigure]{labelformat=empty}
+
+\title{The \texttt{elasticrow} package}
+\author{Michal Kaut}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+	This package introduces a new environment \verb|elasticrow| and command \verb|\elasticfigure| for aligning several images in one row/line so that they have the same height and, at the same time, fill a specified width, with an optionally specified white space between.
+	
+	It is based on a \href{https://tex.stackexchange.com/q/227935}{StackExchange solution by Herbert Kruitbosch}.
+\end{abstract}
+
+\section{Usage}
+
+The general usage is illustrated in the following example:
+
+\begin{figure}[!h]
+	\centering
+	\begin{elasticrow}[width=0.75\linewidth, sep=1em]
+		\elasticfigure[Figure with an A]{example-image-a}
+		\elasticfigure[A 16x9 figure]{example-image-16x9}
+	\end{elasticrow}
+	\caption{Caption of the surrounding \texttt{figure} environment}
+\end{figure}
+
+\noindent
+typeset as
+\begin{verbatim}
+	\begin{figure}[!h]
+	    \centering
+	    \begin{elasticrow}[width=0.75\linewidth, sep=1em]
+	        \elasticfigure[Figure with an A]{example-image-a}
+	        \elasticfigure[A 16x9 figure]{example-image-16x9}
+	    \end{elasticrow}
+	    \caption{Caption of the surrounding \texttt{figure} environment}
+	\end{figure}
+\end{verbatim}
+
+
+\subsection{Control parameters}
+
+The package exposes two lengths:
+\begin{description}
+	\item[\texttt{\textbackslash{}elasticrowwidth}] is the width of the rows; it defaults to \verb*|\textwidth|
+	\item[\texttt{\textbackslash{}elasticrowsep}] is the white space between figures; it defaults to \verb*|0pt|
+\end{description}
+
+\subsection{Commands and environments}
+
+Each figure is placed using the \verb*|\elasticfigure[<caption>]{<figure_file>}| command, where \verb*|<figure_file>| is a file name of the included figure (which will be passed to \verb*|\includegraphics{}|) and \verb*|<caption>| is an optional caption.
+
+All \verb*|\elasticfigure|s that should be on one line have to be put inside an \verb*|elasticrow| environment.
+Its opening syntax is \verb*|\begin{elasticrow}[<options>]|, where the optional \verb*|<options>| is a key-value string with allowed keys \verb*|width| and \verb*|sep|, overriding the default lengths \verb*|\elasticrowwidth| and \verb*|\elasticrowsep|, respectively.
+
+\subsection{Notes}
+
+\verb*|\elasticfigure| puts figures into a \verb*|\subcaptionbox{}| only if they have captions, otherwise it uses a pure \verb*|\includegraphics{}| command.
+This means that if all figures are without captions, they can be placed outside of \verb*|figure| environment:
+
+\begin{center}
+	\begin{elasticrow}
+		\elasticfigure{example-image-a}
+		\elasticfigure{example-image-b}
+		\elasticfigure{example-image-c}
+		\elasticfigure{example-image-golden}
+	\end{elasticrow}
+\end{center}
+typeset using the default values of \verb*|\elasticrowwidth| and \verb*|\elasticrowsep| as
+\begin{verbatim}
+\begin{center}
+    \begin{elasticrow}
+        \elasticfigure{example-image-a}
+        \elasticfigure{example-image-b}
+        \elasticfigure{example-image-c}
+        \elasticfigure{example-image-golden}
+    \end{elasticrow}
+\end{center}
+\end{verbatim}
+
+\end{document}
