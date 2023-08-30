@@ -23,7 +23,8 @@
 \newif\ifelasticrow@fullwidth
 
 %% command for adding figures to the row
-% syntax: \elasticfigure[<caption>]{<figure_file>}
+% syntax: \elasticfigure[<options>]{<figure_file>},
+% where <options> use a key-value syntax with keys 'caption' and 'label'
 \newcommand{\elasticfigure}[2][\empty]{%
 	\elasticbox@argtoks=\expandafter{\the\elasticbox@argtoks\elasticfun[#1]{#2}}%
 }
@@ -31,6 +32,9 @@
 %% keys for the elasticrow environment
 \define@key{elasticrow@key}{width}{\setlength{\elasticrow@width}{#1}}
 \define@key{elasticrow@key}{sep}{\def\elasticrow@whitespace{#1}}
+%% keys for the elasticfigure command
+\define@key{elasticfigure@key}{caption}{\def\elasticfigure@caption{#1}}
+\define@key{elasticfigure@key}{label}{\def\elasticfigure@label{#1}}
 
 %% environment for the elastic row
 % syntax: \begin{elasticrow}[<options>],
@@ -39,7 +43,6 @@
 	\setlength{\elasticrow@width}{\elasticrowwidth}%
 	\def\elasticrow@whitespace{\elasticrowsep}%
 	\setkeys{elasticrow@key}{#1}%
-	\ifdimequal{\elasticrow@width}{\textwidth}{\elasticrow@fullwidthtrue}{\elasticrow@fullwidthfalse}%
 	\elasticbox@argtoks={}%
 }{%
 	\addtolength{\elasticrow@width}{\elasticrow@whitespace}%
@@ -61,7 +64,9 @@
 	\ifx#1\empty%
 		\includegraphics[height=\elasticrow@height]{#2}%
 	\else%
-		\subcaptionbox{#1}{\includegraphics[height=\elasticrow@height]{#2}}%
+		% Set the provided key-value pairs
+		\setkeys{elasticfigure@key}{#1}%
+		\subcaptionbox{\elasticfigure@caption\label{\elasticfigure@label}}{\includegraphics[height=\elasticrow@height]{#2}}%
 	\fi%
 	% set \elasticrow@sep for the next figures
 	% - uses \fill for full-width rows, to prevent line break due to minor width overflow

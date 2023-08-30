@@ -27,10 +27,17 @@ The general usage is illustrated in the following example:
 \begin{figure}[!h]
 	\centering
 	\begin{elasticrow}[width=0.75\linewidth, sep=1em]
-		\elasticfigure[Figure with an A]{example-image-a}
-		\elasticfigure[A 16x9 figure]{example-image-16x9}
+		\elasticfigure[
+			caption=Figure with an A,
+			label=fig:subfig1
+		]{example-image-a}
+		\elasticfigure[
+			caption=A 16x9 figure,
+			label=fig:subfig2
+		]{example-image-16x9}
 	\end{elasticrow}
 	\caption{Caption of the surrounding \texttt{figure} environment}
+	\label{fig:fig1}
 \end{figure}
 
 \noindent
@@ -39,13 +46,20 @@ typeset as
 	\begin{figure}[!h]
 	    \centering
 	    \begin{elasticrow}[width=0.75\linewidth, sep=1em]
-	        \elasticfigure[Figure with an A]{example-image-a}
-	        \elasticfigure[A 16x9 figure]{example-image-16x9}
+	        \elasticfigure[
+	            caption=Figure with an A,
+	            label=fig:subfig1
+	    	]{example-image-a}
+	    	\elasticfigure[
+		        caption=A 16x9 figure,
+		        label=fig:subfig2
+	    	]{example-image-16x9}
 	    \end{elasticrow}
 	    \caption{Caption of the surrounding \texttt{figure} environment}
 	\end{figure}
 \end{verbatim}
 
+, where each subfigure can be individually referenced with \verb*|Fig.~\ref{fig:subfig1}|, \verb*|Fig.~\ref{fig:subfig2}|, and \verb*|Fig.~\ref{fig:sub1}|, rendered as Fig.~\ref{fig:subfig1}, Fig.~\ref{fig:subfig2}, and Fig.~\ref{fig:fig1}.
 
 \subsection{Control parameters}
 
